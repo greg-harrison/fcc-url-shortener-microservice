@@ -1,1 +1,21 @@
-h1 Hello World ;D
+h1 Hello #{!!payload.error ? payload.error : 'World'}! ;D
+
+a(href='https://expressjs.com/en/guide/database-integration.html')
+  span Database integration docs
+
+p Explanation of problem and goals
+p - User can pass a url as a param and receive the shortened url.
+p - Invalid url returns error
+
+p How will it work?
+p We set up a MongoDB with a schema of ID, InputUrl, OutputUrl
+p We have 2 routes, create/:inputUrl and /:outputUrl
+
+p When the user sends a valid URL to the Create route, we add it to the DB with a made-up outputUrl
+p When the user sends the /:outputUrl, we do a lookup in Mongo, find the record with the matching outputUrl and then return the corresponding InputUrl
+
+p Steps:
+p 1. Take in URL on /create and ensure that it is valid (need a function similar to the Malformed URL middleware)
+p 2. Set up Mongo and Mongoose Schema
+p 3. Set up and test that Create works in our DB
+p 4. Ensure that hitting /:outputUrl can return a value from the Db
