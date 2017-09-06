@@ -1,11 +1,28 @@
 const express = require('express')
 const pug = require('pug')
 const middleware = require('./middleware')
+const mongoose = require('mongoose')
+const mongoDB = 'mongodb://127.0.0.1/fcc_url_shortener'
 // Need to add a Controllers file for the validations and for the Mongoose setup
-//require mongoose
+
+// Valid url pairs should be stored like this
+// {
+//   id: int,
+//   userUrl: String,
+//   shortenedUrl: String
+// }
+
+mongoose.connect(mongoDB)
 
 const compiledTemplate = pug.compileFile('templates/template.pug')
 const app = express()
+const db_promise = mongoose.connect(mongoDB, {
+  useMongoClient: true,
+  /* other options */
+});
+db_promise.then((db) => {
+  console.log('db', db);
+})
 
 app.use(middleware.malformedUrl)
 
