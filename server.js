@@ -20,8 +20,18 @@ const db_promise = mongoose.connect(mongoDB, {
   useMongoClient: true,
   /* other options */
 });
+
+const urlSchema = mongoose.Schema({
+  userUrl: String,
+  shortenedUrl: String
+})
+
+const UrlStorage = mongoose.model('UrlStorage', urlSchema)
+
+var urlDocument = new UrlStorage({})
+
 db_promise.then((db) => {
-  console.log('db', db);
+  console.log('hello')
 })
 
 app.use(middleware.malformedUrl)
@@ -31,7 +41,6 @@ app.get('/:outputUrl?', (req, res) => {
 
   if (req.params.outputUrl) {
     // Check to see if the url is valid
-
     let urlValid
 
     if (urlValid) {
@@ -46,6 +55,21 @@ app.get('/:outputUrl?', (req, res) => {
 })
 app.get('/create/:inputUrl', (req, res) => {
   console.log('req', req);
+
+  // Validate inputUrl
+
+  // Shortened
+  // First and Last letters from domain name
+  // last 2 numbers from New Date()
+
+  let userUrl = 'http://test.com'
+  let shortUrl = 't.co'
+
+  urlDocument.save((err, urlDocument) => {
+    urlDocument.userUrl = userUrl
+    urlDocument.shortenedUrl = shortUrl
+  })
+
 })
 
 app.listen(8000, () => {
