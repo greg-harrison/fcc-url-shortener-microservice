@@ -1,34 +1,23 @@
 const express = require('express')
 const pug = require('pug')
 const middleware = require('./middleware')
-const mongoose = require('mongoose')
 const mongoDB = 'mongodb://127.0.0.1/fcc_url_shortener'
-// Need to add a Controllers file for the validations and for the Mongoose setup
+const mongoose = require('mongoose')
+const urlStorageModel = require('./models/url_model.js')
+const urlController = require('./controllers/db_controller')
+const mainController = require('./controllers/main_controller')
 
-// Valid url pairs should be stored like this
-// {
-//   id: int,
-//   userUrl: String,
-//   shortenedUrl: String
-// }
+// Need to add a Controllers file for the validations and for the Mongoose setup
 
 mongoose.connect(mongoDB)
 
 const compiledTemplate = pug.compileFile('templates/template.pug')
 const app = express()
+
 const db_promise = mongoose.connect(mongoDB, {
   useMongoClient: true,
-  /* other options */
 });
 
-const urlSchema = mongoose.Schema({
-  userUrl: String,
-  shortenedUrl: String
-})
-
-const UrlStorage = mongoose.model('UrlStorage', urlSchema)
-
-var urlDocument = new UrlStorage({})
 
 db_promise.then((db) => {
   console.log('hello')
@@ -38,6 +27,8 @@ app.use(middleware.malformedUrl)
 
 app.get('/:outputUrl?', (req, res) => {
   let payload = {}
+  payload = urlController.urlStorage_list
+  console.log(JSON.stringify(payload, null, 2))
 
   if (req.params.outputUrl) {
     // Check to see if the url is valid
@@ -56,6 +47,10 @@ app.get('/:outputUrl?', (req, res) => {
 app.get('/create/:inputUrl', (req, res) => {
   console.log('req', req);
 
+  // TODO: Solve issues where we get Undefined when we pass an actual URL
+  // TODO: Get Mongo running on other machine
+  // !!(since it's from Brew, $brew services start mongodb)
+
   // Validate inputUrl
 
   // Shortened
@@ -65,10 +60,26 @@ app.get('/create/:inputUrl', (req, res) => {
   let userUrl = 'http://test.com'
   let shortUrl = 't.co'
 
-  urlDocument.save((err, urlDocument) => {
-    urlDocument.userUrl = userUrl
-    urlDocument.shortenedUrl = shortUrl
-  })
+  console.log('req.paramas.inputUrl', req.params.inputUrl);
+
+  if (req.params.inputUrl) {
+    // Check to see if the url is valid
+    let urlValid
+
+    mainController.validateUrl({ 'inputUrl': req.params.inputUrl })
+
+    if (urlValid) {
+      urlController.urlStorage_post({
+        userUrl,
+        shortUrl
+      })
+    } else {
+      payload.error = 'Invalid Url'
+      res.send(compiledTemplate({ payload }))
+    }
+  } else {
+    res.send(compiledTemplate({ payload }))
+  }
 
 })
 
