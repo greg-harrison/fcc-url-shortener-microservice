@@ -3,15 +3,15 @@ const middleware = require('./middleware')
 const mongoDB = 'mongodb://127.0.0.1/fcc_url_shortener'
 const mongoose = require('mongoose')
 const routes = require('./routes')
+const app = express()
+const port = process.env.PORT || 8000
 
 mongoose.connect(mongoDB)
-
-const app = express()
 
 app.use(middleware.malformedUrl)
 
 app.use('/', routes)
 
-app.listen(8000, () => {
-  console.log('The server is running on port 8000');
+app.listen(port, () => {
+  console.log('The server is running on port:', port);
 })

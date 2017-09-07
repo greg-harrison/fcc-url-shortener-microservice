@@ -1,13 +1,19 @@
-const Urls = require('../models/url_model')
-const mainController = require('./main_controller')
+const Urls = require('../models/url')
+const mainController = require('./main')
+const pug = require('pug')
+const compiledTemplate = pug.compileFile('templates/success.pug')
 
 module.exports = {
-
   createUrl: (req, res) => {
+    console.log('req', req);
+
     const urlDoc = {
       userUrl: req.userUrl,
       shortenedUrl: req.shortUrl
     }
+
+    console.log('urlDoc', urlDoc);
+    let payload = urlDoc
 
     if (!!req.params.inputUrl) {
       let urlValid
@@ -34,12 +40,3 @@ module.exports = {
     res.send('NOT IMPLEMENTED: GET specific record')
   }
 }
-
-app.get('/create/:inputUrl', (req, res) => {
-  console.log('req.params', req.params);
-
-  let payload = {}
-  let userUrl = 'http://test.com'
-  let shortUrl = 't.co'
-
-})
