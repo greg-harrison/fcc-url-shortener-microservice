@@ -7,8 +7,7 @@ const compiledTemplate = pug.compileFile('templates/template.pug')
 router.use('/url', require('./urls'))
 
 router.get('/', (req, res) => {
-  console.log('hello world');
-  res.send('Hello')
+  res.send(compiledTemplate())
 })
 
 module.exports = router

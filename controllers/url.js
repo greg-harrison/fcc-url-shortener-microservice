@@ -5,25 +5,27 @@ const compiledTemplate = pug.compileFile('templates/success.pug')
 
 module.exports = {
   createUrl: (req, res) => {
-    console.log('req', req);
+    console.log('', req.params[0])
+    let payload = {}
 
-    const urlDoc = {
-      userUrl: req.userUrl,
-      shortenedUrl: req.shortUrl
-    }
+    // Run a FINDONE so that we can make sure it's not already in the db
 
-    console.log('urlDoc', urlDoc);
-    let payload = urlDoc
+    if (!!req.params[0]) {
+      let url = req.params[0]
 
-    if (!!req.params.inputUrl) {
-      let urlValid
-
-      mainController.validateUrl({ 'inputUrl': req.params.inputUrl })
+      let urlValid = mainController.validateUrl(url)
 
       if (urlValid) {
-        var newUrl = new Urls(urlDoc)
+
+        payload = {
+          userUrl: url,
+          shortenedUrl: mainController.generateShortUrl(url)
+        }
+
+        let newUrl = new Urls(payload)
         newUrl.save()
-        res.send('Saved')
+
+        res.send(compiledTemplate({ payload }))
       } else {
         payload.error = 'Invalid Url'
         res.send(compiledTemplate({ payload }))
@@ -35,8 +37,8 @@ module.exports = {
   },
 
   navigateToUrl: (req, res) => {
-    console.log('req.params.outputUrl', req.params.outputUrl);
-    console.log(JSON.stringify(res, null, 2))
-    res.send('NOT IMPLEMENTED: GET specific record')
+    Urls.findOne({ shortenedUrl: req.params.outputUrl }, (err, result) => {
+      return res.redirect(result.userUrl)
+    })
   }
 }

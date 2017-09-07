@@ -1,3 +1,4 @@
-p SUCCESS
+p #{payload.userUrl} = #{payload.shortenedUrl}
 
-p #{payload}
+a(href=`/url/` + payload.shortenedUrl)
+  span #{payload.shortenedUrl}
