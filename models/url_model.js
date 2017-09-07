@@ -6,6 +6,5 @@ const urlSchema = new Schema({
   shortenedUrl: String
 })
 
-const urlStorageModel = mongoose.model('UrlStorage', urlSchema)
-
+const urlStorageModel = mongoose.model('url', urlSchema)
 module.exports = urlStorageModel
