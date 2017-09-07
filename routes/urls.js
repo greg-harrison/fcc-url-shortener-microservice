@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const urlController = ('../controllers/url_controller')
+const urlController = require('../controllers/url')
 
-router.get('/:outputUrl?', urlController.navigateToUrl)
+router.get('/:outputUrl', urlController.navigateToUrl)
 router.get('/create/:inputUrl', urlController.createUrl)
 
 module.exports = router
