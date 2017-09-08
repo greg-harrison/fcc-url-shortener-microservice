@@ -6,7 +6,9 @@ const routes = require('./routes')
 const app = express()
 const port = process.env.PORT || 8000
 
-mongoose.connect(mongoDB)
+mongoose.connect(mongoDB, {
+  useMongoClient: true
+})
 
 app.use(middleware.malformedUrl)
 
