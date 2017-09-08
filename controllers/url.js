@@ -6,26 +6,47 @@ const compiledTemplate = pug.compileFile('templates/success.pug')
 module.exports = {
   createUrl: (req, res) => {
     console.log('', req.params[0])
-    let payload = {}
+    let payload = {
+      error: ''
+    }
 
     // Run a FINDONE so that we can make sure it's not already in the db
+
 
     if (!!req.params[0]) {
       let url = req.params[0]
 
       let urlValid = mainController.validateUrl(url)
 
-      if (urlValid) {
+      let urlExists = false
 
-        payload = {
-          userUrl: url,
-          shortenedUrl: mainController.generateShortUrl(url)
+      Urls.findOne({ userUrl: url }, (err, result) => {
+        console.log('res', result);
+        if (result) {
+          console.log('testing');
+          urlExists = true
+          payload.userUrl = url
+          payload.shortenedUrl = result[0].shortenedUrl
         }
 
-        let newUrl = new Urls(payload)
-        newUrl.save()
+        return
+      })
 
-        res.send(compiledTemplate({ payload }))
+      if (urlValid) {
+
+        if (urlExists) {
+
+          res.send(compiledTemplate({ payload }))
+
+        } else {
+          payload.userUrl = url
+          payload.shortenedUrl = mainController.generateShortUrl(url)
+
+          let newUrl = new Urls(payload)
+          newUrl.save()
+
+          res.send(compiledTemplate({ payload }))
+        }
       } else {
         payload.error = 'Invalid Url'
         res.send(compiledTemplate({ payload }))
@@ -37,8 +58,11 @@ module.exports = {
   },
 
   navigateToUrl: (req, res) => {
-    Urls.findOne({ shortenedUrl: req.params.outputUrl }, (err, result) => {
-      return res.redirect(result.userUrl)
-    })
+    Urls.findOne(
+      { shortenedUrl: req.params.outputUrl },
+      (err, result) => {
+        return res.redirect(result.userUrl)
+      }
+    )
   }
 }
